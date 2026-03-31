@@ -44,16 +44,16 @@ CREATE TABLE pokemon (
 ## Workflow complet
 
 `NODE 1 HTTP Request` (pour la liste Pokémon)
- URL mise : https://pokeapi.co/api/v2/pokemon?limit=20
- Méthode utilisée : GET
+ - URL mise : https://pokeapi.co/api/v2/pokemon?limit=20
+ - Méthode utilisée : GET
 
 `NODE 2 Split Out Items` (pour Item Lists)
- Objectif : transformer le tableau "results" en items séparés pour la suite
- Field to Split choisit : results
+ - Objectif : transformer le tableau "results" en items séparés pour la suite
+ - Field to Split choisit : results
 
 `NODE 3 HTTP Request` (pour le détail Pokémon)
- URL choisi : {{ $json.url }}
- Méthode utilisée : GET
+ - URL choisi : {{ $json.url }}
+ - Méthode utilisée : GET
 
 `NODE 4 Function` (transformation des données)
 
@@ -110,7 +110,7 @@ ON CONFLICT (pokemon_id) DO NOTHING;
 ```
 
 `NODE 6 PostgreSQL Suivi de l’ingestion`
-avant pipeline
+- avant pipeline
 
 
 ```SQL
@@ -119,7 +119,7 @@ VALUES ('pokeapi', NOW(), 'running')
 RETURNING id;
 ```
 
-apres pipeline 
+- apres pipeline 
 
 ```SQL
 UPDATE ingestion_runs
