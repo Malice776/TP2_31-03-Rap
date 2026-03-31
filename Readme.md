@@ -172,9 +172,9 @@ SELECT * FROM pokemon WHERE pokemon_name IS NULL OR pokemon_name = '';
 
 L’architecture réalisée suit une logique Data Warehouse car elle suit les principes classiques d’ETL :
 
-`Extraction` : récupération des données depuis la PokéAPI via n8n.
-`Transformation` : nettoyage, normalisation et enrichissement des données (gestion des valeurs manquantes, création de booléens).
-`Chargement` : insertion dans une base relationnelle PostgreSQL avec tables structurées (ingestion_runs).
+- `Extraction` : récupération des données depuis la PokéAPI via n8n.
+- `Transformation` : nettoyage, normalisation et enrichissement des données (gestion des valeurs manquantes, création de booléens).
+- `Chargement` : insertion dans une base relationnelle PostgreSQL avec tables structurées (ingestion_runs).
 
 Cette séparation garantit des données qui son fiables, traçables et prêtes pour l’analyse.
 L’approche est celle d’un data warehouse, car elle permet des requêtes analytiques rapides et répétables sur des données structurées.
