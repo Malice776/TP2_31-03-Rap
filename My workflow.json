@@ -1,0 +1,377 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "058bd2fe-eac6-446b-9456-a895f4ecd914",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://pokeapi.co/api/v2/pokemon?limit=20",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d6314b30-6a60-4829-9cfc-b7369e105fbd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "86d7d1d4-3cfb-4e74-8106-59dbbff2e61e",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const data = item.json;\n\n  return {\n    json: {\n      pokemon_id: data.id,\n      pokemon_name: data.name || null,\n      base_experience: data.base_experience || 0,\n      height: data.height,\n      weight: data.weight,\n      main_type: data.types?.[0]?.type?.name || null,\n      has_official_artwork: !!data.sprites?.other?.[\"official-artwork\"]?.front_default,\n      has_front_sprite: !!data.sprites?.front_default,\n      source_last_updated_at: new Date().toISOString(),\n      ingested_at: new Date().toISOString()\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        0
+      ],
+      "id": "5288f709-988c-4827-9e2d-b01c69eeb40f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "da7f9e43-c1f7-48e3-8100-1ccd07908c93",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO pokemon (\n    pokemon_id,\n    pokemon_name,\n    base_experience,\n    height,\n    weight,\n    main_type,\n    has_official_artwork,\n    has_front_sprite,\n    source_last_updated_at,\n    ingested_at\n)\nVALUES (\n    {{$json.pokemon_id}},\n    '{{$json.pokemon_name}}',\n    {{$json.base_experience}},\n    {{$json.height}},\n    {{$json.weight}},\n    '{{$json.main_type}}',\n    {{$json.has_official_artwork}},\n    {{$json.has_front_sprite}},\n    '{{$json.source_last_updated_at}}',\n    '{{$json.ingested_at}}'\n)\nON CONFLICT (pokemon_id) DO NOTHING;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "d4464265-5c8d-47c9-a271-43c97c9f422e",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "K6s1mqhepTIGwvuO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM pokemon;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "5ddca152-bfd6-4a3f-8d2d-1a274a6eee7c",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "K6s1mqhepTIGwvuO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) FROM pokemon;\n\nSELECT COUNT(*) FROM pokemon WHERE has_official_artwork = FALSE;\n\nSELECT COUNT(*) FROM pokemon WHERE has_front_sprite = FALSE;\n\nSELECT main_type, COUNT(*) FROM pokemon GROUP BY main_type;\n\nSELECT * FROM pokemon WHERE pokemon_name IS NULL;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1472,
+        0
+      ],
+      "id": "5d9589b4-86fa-4d95-9cfc-81123d789a45",
+      "name": "Execute a SQL query2",
+      "credentials": {
+        "postgres": {
+          "id": "K6s1mqhepTIGwvuO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const data = item.json;\n\n  return {\n    json: {\n      pokemon_id: data.id,\n      pokemon_name: data.name,\n      file_name: data.id + \".json\",\n      bucket_name: \"raw-pokemon\",\n      object_key: data.id + \".json\",\n      file_data: JSON.stringify(data) // le contenu JSON\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        256
+      ],
+      "id": "7bc55bd9-4658-4689-b17d-b9de41b0f2aa",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{$json.bucket_name}}",
+        "fileName": "={{$json.file_name}}",
+        "binaryData": false,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        384
+      ],
+      "id": "db66ba44-f305-4bb8-9805-3821e9a96985",
+      "name": "Upload a file",
+      "credentials": {
+        "s3": {
+          "id": "rZZ766UWAF60Pkpm",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO pokemon_files (pokemon_id, bucket_name, object_key, file_name, file_type)\nVALUES (\n  {{ $('Code in JavaScript1').item.json.pokemon_id }},\n  '{{ $('Code in JavaScript1').item.json.bucket_name }}',\n  '{{ $('Code in JavaScript1').item.json.object_key }}',\n  '{{ $('Code in JavaScript1').item.json.file_name }}',\n  'application/json'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1296,
+        384
+      ],
+      "id": "a7b25339-1756-4dd0-9b3c-0920316e803a",
+      "name": "Execute a SQL query3",
+      "credentials": {
+        "postgres": {
+          "id": "K6s1mqhepTIGwvuO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO file_ingestion_log (file_name, bucket_name, object_key, source, status)\nVALUES (\n  '{{ $json.file_name }}',\n  '{{ $json.bucket_name }}',\n  '{{$json.object_key}}',\n  'pokeapi',\n  'success'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1488,
+        256
+      ],
+      "id": "0df18a90-8f5c-4457-b354-27df3258d628",
+      "name": "Execute a SQL query4",
+      "credentials": {
+        "postgres": {
+          "id": "K6s1mqhepTIGwvuO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "TP 1",
+        "height": 224,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "7cb778f2-c89e-4696-9bc0-7b71ef8f4366",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "TP 2",
+        "height": 352,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        224
+      ],
+      "id": "2a096e74-2f4a-47a1-a876-6f9961aaba48",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query3": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "db3a2d00-8423-4897-b294-05d0be65f8e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bcfdfea4d5c363047600934ffcc7cb3bfd309d82b8ebd428ae2743f114742b66"
+  },
+  "id": "AdjUC4kuNeJoAajH",
+  "tags": []
+}
