@@ -1,4 +1,4 @@
-# TP2 Pipeline structuré Pokémon avec PokeAPI, n8n et PostgreSQL
+# TP1 Pipeline structuré Pokémon avec PokeAPI, n8n et PostgreSQL
 
 
 ## Partie A Mise en place de l'environnement
@@ -78,7 +78,7 @@ return $input.all().map(item => {
 });
 ```
 
-## NODE 5 PostgreSQL Insertion dans pokemon
+`NODE 5 PostgreSQL Insertion dans pokemon`
 
 ```SQL
 
@@ -109,7 +109,7 @@ VALUES (
 ON CONFLICT (pokemon_id) DO NOTHING;
 ```
 
-## NODE 6 PostgreSQL Suivi de l’ingestion
+`NODE 6 PostgreSQL Suivi de l’ingestion`
 avant pipeline
 
 
