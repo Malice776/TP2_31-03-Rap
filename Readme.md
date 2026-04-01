@@ -338,3 +338,9 @@ Cette architecture est donc plus proche d’un Data Lake / Lakehouse que d’une
 `TP1_Workflow.png (workflow TP1)`
 `TP2_Workflow.png (workflow TP2)`
 
+## TP3
+
+# Partie H - Réponses aux Questions Théoriques
+
+Une couche analytique intermédiaire est essentielle car elle découple la complexité technique des tables d'ingestion des besoins métiers simples. Elle permet de normaliser les données, de pré-calculer des scores de qualité et de garantir une source unique de vérité ("Single Source of Truth") pour le dashboard et l'automatisation. Nos KPI ont été choisis pour couvrir les trois piliers de la qualité : la présence des données, la diversité des média et la fiabilité de stockage (MinIO). La restitution visuelle permet un pilotage proactif en mettant en évidence les "trous" dans le catalogue, tandis que Discord offre un point d'entrée mobile et interactif idéal pour des alertes en temps réel sans devoir ouvrir une interface complexe. La différence fondamentale entre une requête SQL et une automatisation pilotée réside dans l'expérience utilisateur : l'automatisation transforme une donnée brute en une information structurée, contextualisée et actionnable, livrée nativement là où l'utilisateur travaille déjà (Discord) plutôt que d'attendre une extraction manuelle.
+

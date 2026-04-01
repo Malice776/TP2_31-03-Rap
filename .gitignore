@@ -1,0 +1,14 @@
+# Secrets
+.env
+*.log
+
+# Docker
+.docker_temp
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
